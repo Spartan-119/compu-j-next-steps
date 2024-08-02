@@ -10,11 +10,9 @@ Each dot is a day where VWAP and first price had a little rendezvous. The closer
 
 ### VWAP vs First Price Over Time
 ![VWAP vs First Price](output/VWAP_vs_first_price.png)
-Check out this rollercoaster! The blue line is our VWAP doing its thing, while the orange one shows the first price of each day. Looks like they're having a race!
 
 ### VWAP Distribution
 ![VWAP Histogram](output/VWAP_histogram.png)
-Here's where our VWAPs like to hang out. It's like a bar graph, but fancier - we call it a histogram in the biz.
 
 ### Flagged Days
 ![Flagged Days Plot](output/Flagged_days_plot.png)
