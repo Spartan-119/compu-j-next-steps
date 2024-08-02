@@ -15,7 +15,7 @@ def process_bund_futures_data(db_path, start_date, end_date):
     db.close()
 
     # Convert the DateTime column to pandas datetime
-    df['DateTime'] = pd.to_datetime(df['DateTime'], format='mixed')
+    df['DateTime'] = pd.to_datetime(df['DateTime'], format = 'mixed')
 
     # just filtering the rows in which we are interested in
     df = df[(df['DateTime'] >= start_date) & (df['DateTime'] <= end_date)]
@@ -66,7 +66,7 @@ def process_bund_futures_data(db_path, start_date, end_date):
             })
         
         # Move to the next day
-        current_date += pd.Timedelta(days=1)
+        current_date += pd.Timedelta(days = 1)
 
     # Convert the results to a DataFrame
     results_df = pd.DataFrame(results)
@@ -84,10 +84,10 @@ def main():
     results_df = process_bund_futures_data(db_path, start_date, end_date)
     
     # Create 'output' directory if it doesn't exist
-    os.makedirs('output', exist_ok=True)
+    os.makedirs('output', exist_ok = True)
     
     # Save the results to a CSV file in the 'output' folder
-    results_df.to_csv('output/results.csv', index=False)
+    results_df.to_csv('output/results.csv', index = False)
     
     print("Processing complete. Results saved to 'output/results.csv'.")
 
