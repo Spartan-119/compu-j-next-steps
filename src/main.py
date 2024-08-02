@@ -46,12 +46,12 @@ def process_bund_futures_data(db_path, start_date, end_date):
             # between 17:14:00 and 17:15:00 inclusive
             start_time = datetime.combine(current_date.date(), time(17, 14))
             end_time = datetime.combine(current_date.date(), time(17, 15))
-            vw_data = todays_date[(todays_date['DateTime'] >= start_time) & (todays_date['DateTime'] < end_time)]
+            volume_weighted_data = todays_date[(todays_date['DateTime'] >= start_time) & (todays_date['DateTime'] < end_time)]
             
             # Calculate the VWAP using the helper function
-            vw_avg_price = calculate_vwap(vw_data)
+            volume_weighed_avg_price = calculate_vwap(volume_weighted_data)
             
-            # Check if the first price of the day is traded after 17:15:00
+            # Checking if the first price of the day is traded after 17:15:00
             after_time = datetime.combine(current_date.date(), time(17, 15))
             after_data = todays_date[todays_date['DateTime'] >= after_time]
             
@@ -66,7 +66,7 @@ def process_bund_futures_data(db_path, start_date, end_date):
             results.append({
                 'day': current_date.strftime('%Y-%m-%d'),
                 'first_price': first_price,
-                'vw_avg_price': vw_avg_price,
+                'volume_weighed_avg_price': volume_weighed_avg_price,
                 'flag': flag,
                 'first_trade_time': first_trade_time.strftime('%H:%M:%S.%f') if first_trade_time else None
             })
@@ -80,20 +80,16 @@ def process_bund_futures_data(db_path, start_date, end_date):
     return results_df
 
 def main():
-    # Set the path to the SQLite database
+    # doign some necessary stuff
     db_path = 'data/BNZ12.sqlite'
-    
-    # Set the date range
     start_date, end_date = '2012-09-05', '2012-12-04'
-    
-    # Process the data
     results_df = process_bund_futures_data(db_path, start_date, end_date)
     
     # Create 'output' directory if it doesn't exist
-    os.makedirs('output', exist_ok=True)
+    os.makedirs('output', exist_ok = True)
     
     # Save the results to a CSV file in the 'output' folder
-    results_df.to_csv('output/results.csv', index=False)
+    results_df.to_csv('output/results.csv', index = False)
     
     print("Processing complete. Results saved to 'output/results.csv'.")
 

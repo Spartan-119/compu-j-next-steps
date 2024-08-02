@@ -1,4 +1,4 @@
-day,first_price,vw_avg_price,flag,first_trade_time
+day,first_price,volume_weighed_avg_price,flag,first_trade_time
 2012-09-05,141.82,141.40318281455504,False,
 2012-09-06,141.28,140.20429780876492,False,
 2012-09-07,140.17,140.65274932614557,False,
