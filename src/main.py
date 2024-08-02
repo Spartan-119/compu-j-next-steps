@@ -13,17 +13,13 @@ def calculate_vwap(data):
     return total_value / total_volume
 
 def process_bund_futures_data(db_path, start_date, end_date):
-    # connecting to the sqlite database
+    # connecting to the sqlite database adn then closing it
     db = sqlite3.connect(db_path)
-
-    # reading the data from the sqlite db
     df = pd.read_sql_query('SELECT * FROM tickdata', db)
-
-    # closing the connection to the db
     db.close()
 
     # Convert the DateTime column to pandas datetime
-    df['DateTime'] = pd.to_datetime(df['DateTime'], format='mixed')
+    df['DateTime'] = pd.to_datetime(df['DateTime'], format = 'mixed')
 
     # just filtering the rows in which we are interested in
     df = df[(df['DateTime'] >= start_date) & (df['DateTime'] <= end_date)]
