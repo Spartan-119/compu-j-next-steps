@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import sqlite3
 from datetime import datetime, time
 import os
@@ -75,19 +76,68 @@ def process_bund_futures_data(db_path, start_date, end_date):
     
     return results_df
 
+###############
+# some additional code to visualise a few stufff
+
+# time series plot of VWAP and First Price
+def plot_vwap_vs_first_price(results_df):
+    plt.figure(figsize=(14, 7))
+    plt.plot(results_df['day'], results_df['volume_weighed_avg_price'], label='VWAP', marker='o')
+    plt.plot(results_df['day'], results_df['first_price'], label='First Price', marker='x')
+    plt.xlabel('Date')
+    plt.ylabel('Price')
+    plt.title('VWAP vs First Price Over Time')
+    plt.legend()
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig('output\plot_vwap_vs_first_price.png')
+
+# Histogram of VWAP
+def plot_vwap_histogram(results_df):
+    plt.figure(figsize=(10, 6))
+    plt.hist(results_df['volume_weighed_avg_price'].dropna(), bins=20, edgecolor='k')
+    plt.xlabel('VWAP')
+    plt.ylabel('Frequency')
+    plt.title('Distribution of VWAP')
+    plt.savefig("output\VWAP_histogram.png")
+
+# Scatter Plot of VWAP vs First Price
+def plot_vwap_vs_first_price_scatter(results_df):
+    plt.figure(figsize=(10, 6))
+    plt.scatter(results_df['first_price'], results_df['volume_weighed_avg_price'], alpha=0.6)
+    plt.xlabel('First Price')
+    plt.ylabel('VWAP')
+    plt.title('VWAP vs First Price')
+    plt.savefig("output\VWAP_vs_first_price.png")
+
+# Flagged Days Plot
+def plot_flagged_days(results_df):
+    flag_counts = results_df['flag'].value_counts()
+    plt.figure(figsize=(8, 6))
+    flag_counts.plot(kind='bar', color=['blue', 'orange'])
+    plt.xlabel('Flag')
+    plt.ylabel('Number of Days')
+    plt.title('Number of Days with Flag True/False')
+    plt.xticks([0, 1], ['False', 'True'], rotation=0)
+    plt.savefig('output\Flagged_days_plot.png')
+
 def main():
     # doign some necessary stuff
     db_path = 'data/BNZ12.sqlite'
     start_date, end_date = '2012-09-05', '2012-12-04'
     results_df = process_bund_futures_data(db_path, start_date, end_date)
+    plot_vwap_vs_first_price(results_df)
+    plot_vwap_histogram(results_df)
+    plot_vwap_vs_first_price_scatter(results_df)
+    plot_flagged_days(results_df)
+
+    # # Create 'output' directory if it doesn't exist
+    # os.makedirs('output', exist_ok = True)
     
-    # Create 'output' directory if it doesn't exist
-    os.makedirs('output', exist_ok = True)
+    # # Save the results to a CSV file in the 'output' folder
+    # results_df.to_csv('output/results.csv', index = False)
     
-    # Save the results to a CSV file in the 'output' folder
-    results_df.to_csv('output/results.csv', index = False)
-    
-    print("Processing complete. Results saved to 'output/results.csv'.")
+    # print("Processing complete. Results saved to 'output/results.csv'.")
 
 if __name__ == "__main__":
     main()
