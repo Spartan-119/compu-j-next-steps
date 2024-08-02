@@ -5,7 +5,7 @@ from datetime import datetime, time
 import os
 
 def calculate_vwap(data):
-    """Calculate the volume-weighted average price (VWAP)."""
+    """Method to calculate the volume-weighted average price (VWAP)."""
     total_value = (data['Price'] * data['LotsTraded']).sum()
     total_volume = data['LotsTraded'].sum()
     if total_volume == 0:
@@ -62,7 +62,7 @@ def process_bund_futures_data(db_path, start_date, end_date):
                 flag = False
                 first_trade_time = None
             
-            # Append the results for the current day
+            # Appending the results for the current day
             results.append({
                 'day': current_date.strftime('%Y-%m-%d'),
                 'first_price': first_price,
