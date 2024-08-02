@@ -29,16 +29,16 @@ def process_bund_futures_data(db_path, start_date, end_date):
 
     while current_date <= end_date:
         # extract today's date
-        todays_date = df[df['DateTime'].dt.date == current_date.date()]
+        todays_data = df[df['DateTime'].dt.date == current_date.date()]
 
-        if not todays_date.empty: 
-            first_price = todays_date.iloc[0]['Price']
+        if not todays_data.empty: 
+            first_price = todays_data.iloc[0]['Price']
 
             # logic to calculate the volume-weighted price in the 1 minute
             # between 17:14:00 and 17:15:00 inclusive
             start_time = datetime.combine(current_date.date(), time(17, 14))
             end_time = datetime.combine(current_date.date(), time(17, 15))
-            vw_data = todays_date[(todays_date['DateTime'] >= start_time) & (todays_date['DateTime'] < end_time)]
+            vw_data = todays_data[(todays_data['DateTime'] >= start_time) & (todays_data['DateTime'] < end_time)]
             
             if not vw_data.empty:
                 vw_avg_price = (vw_data['Price'] * vw_data['LotsTraded']).sum() / vw_data['LotsTraded'].sum()
@@ -47,7 +47,7 @@ def process_bund_futures_data(db_path, start_date, end_date):
             
             # Check if the first price of the day is traded after 17:15:00
             after_time = datetime.combine(current_date.date(), time(17, 15))
-            after_data = todays_date[todays_date['DateTime'] >= after_time]
+            after_data = todays_data[todays_data['DateTime'] >= after_time]
             
             if not after_data.empty and first_price in after_data['Price'].values:
                 flag = True
