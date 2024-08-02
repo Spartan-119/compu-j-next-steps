@@ -4,6 +4,14 @@ import sqlite3
 from datetime import datetime, time
 import os
 
+def calculate_vwap(data):
+    """Calculate the volume-weighted average price (VWAP)."""
+    total_value = (data['Price'] * data['LotsTraded']).sum()
+    total_volume = data['LotsTraded'].sum()
+    if total_volume == 0:
+        return None
+    return total_value / total_volume
+
 def process_bund_futures_data(db_path, start_date, end_date):
     # connecting to the sqlite database
     db = sqlite3.connect(db_path)
@@ -15,7 +23,7 @@ def process_bund_futures_data(db_path, start_date, end_date):
     db.close()
 
     # Convert the DateTime column to pandas datetime
-    df['DateTime'] = pd.to_datetime(df['DateTime'], format = 'mixed')
+    df['DateTime'] = pd.to_datetime(df['DateTime'], format='mixed')
 
     # just filtering the rows in which we are interested in
     df = df[(df['DateTime'] >= start_date) & (df['DateTime'] <= end_date)]
@@ -29,25 +37,23 @@ def process_bund_futures_data(db_path, start_date, end_date):
 
     while current_date <= end_date:
         # extract today's date
-        todays_data = df[df['DateTime'].dt.date == current_date.date()]
+        todays_date = df[df['DateTime'].dt.date == current_date.date()]
 
-        if not todays_data.empty: 
-            first_price = todays_data.iloc[0]['Price']
+        if not todays_date.empty: 
+            first_price = todays_date.iloc[0]['Price']
 
             # logic to calculate the volume-weighted price in the 1 minute
             # between 17:14:00 and 17:15:00 inclusive
             start_time = datetime.combine(current_date.date(), time(17, 14))
             end_time = datetime.combine(current_date.date(), time(17, 15))
-            vw_data = todays_data[(todays_data['DateTime'] >= start_time) & (todays_data['DateTime'] < end_time)]
+            vw_data = todays_date[(todays_date['DateTime'] >= start_time) & (todays_date['DateTime'] < end_time)]
             
-            if not vw_data.empty:
-                vw_avg_price = (vw_data['Price'] * vw_data['LotsTraded']).sum() / vw_data['LotsTraded'].sum()
-            else:
-                vw_avg_price = None
+            # Calculate the VWAP using the helper function
+            vw_avg_price = calculate_vwap(vw_data)
             
             # Check if the first price of the day is traded after 17:15:00
             after_time = datetime.combine(current_date.date(), time(17, 15))
-            after_data = todays_data[todays_data['DateTime'] >= after_time]
+            after_data = todays_date[todays_date['DateTime'] >= after_time]
             
             if not after_data.empty and first_price in after_data['Price'].values:
                 flag = True
@@ -66,7 +72,7 @@ def process_bund_futures_data(db_path, start_date, end_date):
             })
         
         # Move to the next day
-        current_date += pd.Timedelta(days = 1)
+        current_date += pd.Timedelta(days=1)
 
     # Convert the results to a DataFrame
     results_df = pd.DataFrame(results)
@@ -84,10 +90,10 @@ def main():
     results_df = process_bund_futures_data(db_path, start_date, end_date)
     
     # Create 'output' directory if it doesn't exist
-    os.makedirs('output', exist_ok = True)
+    os.makedirs('output', exist_ok=True)
     
     # Save the results to a CSV file in the 'output' folder
-    results_df.to_csv('output/results.csv', index = False)
+    results_df.to_csv('output/results.csv', index=False)
     
     print("Processing complete. Results saved to 'output/results.csv'.")
 
